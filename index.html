@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>CENTRAL DE VENDAS V12 - AUTÔNOMO</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background: #05070a; color: white; overflow-x: hidden; }
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid #f97316; }
+        .glow { box-shadow: 0 0 20px rgba(249, 115, 22, 0.3); }
+    </style>
+</head>
+<body class="w-screen min-h-screen p-6">
+    <header class="flex justify-between items-center mb-10 border-b border-orange-500 pb-4">
+        <h1 class="text-3xl font-bold text-orange-500 tracking-tighter">DROPPFY GEMINI <span class="text-white">V12 AUTONOMOUS</span></h1>
+        <div class="status-bot flex items-center gap-2">
+            <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+            <span class="text-sm font-mono">IA PROCESSANDO VENDAS</span>
+        </div>
+    </header>
+
+    <main class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <section class="glass p-6 rounded-2xl glow">
+            <h2 class="text-xl font-bold mb-4 border-b border-gray-700 pb-2">PROSPECÇÃO ATIVA (LEADS)</h2>
+            <div id="lead-list" class="space-y-4">
+                <div class="p-3 bg-slate-800 rounded-lg text-sm border-l-4 border-orange-500">
+                    <p class="font-bold">+55 61 983446343</p>
+                    <p class="text-gray-400">Interesse: Pix Parcelado</p>
+                    <span class="text-[10px] text-orange-300">IA enviando proposta...</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="lg:col-span-2 glass p-6 rounded-2xl">
+            <h2 class="text-xl font-bold mb-4 text-center">FLUXO DE VENDAS ABSOLUTAS</h2>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-black/50 p-6 rounded-xl border border-gray-800 text-center">
+                    <p class="text-gray-400 text-xs">VENDAS HOJE</p>
+                    <p class="text-4xl font-black text-orange-500">R$ 12.450,00</p>
+                </div>
+                <div class="bg-black/50 p-6 rounded-xl border border-gray-800 text-center">
+                    <p class="text-gray-400 text-xs">CONVERSÃO IA</p>
+                    <p class="text-4xl font-black text-green-500">88%</p>
+                </div>
+            </div>
+            <div class="mt-6 p-4 bg-orange-500/10 rounded-lg border border-orange-500/30">
+                <p class="text-sm italic">"Gemini está analisando o comportamento do cliente e ajustando o link Pagaleve em tempo real."</p>
+            </div>
+       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-10">
+    <div class="card-item border-l-4 border-green-500">
+        <h3 class="text-orange-500 font-bold">SONOTONINA GOMA</h3>
+        <p class="text-xs">Unidades</p>
+        <a href="https://b4.app/a7irxs9z" class="text-blue-400 underline">Link Ativo</a>
+    </div>
+    <div class="card-item border-l-4 border-blue-500">
+        <h3 class="text-orange-500 font-bold">ARTICULA LIFE</h3>
+        <p class="text-xs">Sem dores</p>
+        <a href="https://b4.app/AHeC0EkS" class="text-blue-400 underline">Link Ativo</a>
+    </div>
+
+         <div>
+           <div class="dashboard-v12">
+    <div class="card-item">
+        <h2>DROPPFY</h2>
+        <p>Status: Ativo</p>
+    </div>
+</div>
+         </div>
+    </div>
+
+
+<script>
+async function enviarWhatsApp(to, text) {
+    // 1. O ID do telefone (aquele que começa com 779...) vai aqui:
+    const PHONE_ID = "7794189252778687"; 
+    
+    // 2. O TOKEN gigante (EAAB...) vai entre aspas aqui:
+    const WHATS_TOKEN = "EAAazeesBumMBQUVu3kaQzZCaXOLPIadQ30FPw1PxE6nrBRXZAE2z0UlOgYkGJZCbZCNLL2xuGtn6OCXhDbs142uwZBP6EAINDD3D79QMzhtGyS159O4QWrZCEkZCnplsgIb5pDTZCYGZAcdbHLiLHqZBHPmtihNAxXi1chvwa5HQYKVnHIF0oU4meVwlNSALGZCReZAQAg0HseFks42Ecw7TEzZC8gV5VgYXy5PXxx80HbM5H";
+
+    try {
+        await axios.post(`https://graph.facebook.com/v21.0/${PHONE_ID}/messages`, {
+            messaging_product: "whatsapp",
+            to: to, // Aqui ele envia para o cliente automaticamente
+            type: "text",
+            text: { body: text }
+        }, {
+            headers: { 
+                'Authorization': `Bearer ${WHATS_TOKEN}`,
+                'Content-Type': 'application/json'
+            }
+        });
+    } catch (err) {
+        console.error("Erro no envio:", err.response ? err.response.data : err.message);
+    }
+}
+
+</script>
+
+<script>
+
+  const linksProdutos = {
+    "sono": "https://b4.app/a7irxs9z", // 10 Sonotoninas
+    "dor": "https://b4.app/AHeC0EkS",  // 6 Articula Life
+    "cabelo": "https://b4.app/G0ZJrcwx", // Combo Projeto Cabelão
+    "energia": "https://b4.app/4BZNUEnf" // Weshot Dia
+};
+
+async function processarVenda(fone, mensagem) {
+    let linkFinal = "https://b4.app/ajBGWk3T"; // Padrão: 7 Travesseiros
+    
+    if(mensagem.includes("dor") || mensagem.includes("articulação")) linkFinal = linksProdutos.dor;
+    if(mensagem.includes("dormir") || mensagem.includes("insonia")) linkFinal = linksProdutos.sono;
+    if(mensagem.includes("cabelo") || mensagem.includes("queda")) linkFinal = linksProdutos.cabelo;
+
+    const textoVenda = `Cristian aqui da Droppfy! 🚀 Vi seu interesse. O melhor kit para você hoje é este aqui com condição V12: ${linkFinal}`;
+    
+    await enviarWhatsApp(fone, textoVenda);
+}
+</script>
+
+<script>
+  [
+  { "item": "Travesseiro de Seda", "kit": "7 unidades", "link": "https://b4.app/ajBGWk3T", "tag": "dormir_bem" },
+  { "item": "Articula Life", "kit": "6 Potes", "link": "https://b4.app/AHeC0EkS", "tag": "saude_articulacao" },
+  { "item": "Weshot Noite", "kit": "Kit 3x", "link": "https://b4.app/NGwTcCCx", "tag": "energia_sono" },
+  { "item": "Sonotonina Goma", "kit": "10 unidades", "link": "https://b4.app/a7irxs9z", "tag": "sono_profundo" }
+]
+
+  <div id="painel-v12" class="dashboard-v12">
+    </div>
+
+<script>
+    // LISTA DE PRODUTOS QUE VOCÊ ME DEU
+    const produtos = [
+      { "item": "Travesseiro de Seda", "kit": "7 unidades", "link": "https://b4.app/ajBGWk3T", "tag": "Dormir Bem" },
+      { "item": "Articula Life", "kit": "6 Potes", "link": "https://b4.app/AHeC0EkS", "tag": "Articulação" },
+      { "item": "Weshot Noite", "kit": "Kit 3x", "link": "https://b4.app/NGwTcCCx", "tag": "Sono Profundo" },
+      { "item": "Sonotonina Goma", "kit": "10 unidades", "link": "https://b4.app/a7irxs9z", "tag": "Gummy" },
+      { "item": "Creacola", "kit": "3 Potes", "link": "https://b4.app/J68O5MTY", "tag": "Cabelo" }
+    ];
+
+    const painel = document.getElementById('painel-v12');
+
+    // Função que monta o PDV automaticamente
+    produtos.forEach(prod => {
+        const card = `
+            <div class="card-item glow">
+                <span class="status-badge">${prod.tag}</span>
+                <h3 class="loja-titulo">${prod.item}</h3>
+                <p class="text-sm text-gray-400">${prod.kit}</p>
+                <a href="${prod.link}" target="_blank">
+                    <button class="btn-pagaleve">Copiar Link V12</button>
+                </a>
+            </div>
+        `;
+        painel.innerHTML += card;
+    });
+</script>
+
+          <script>
+            
+          // MOTOR DE VENDA ABSOLUTA - DROPPFY V12
+const gemini = require('./gemini-integration'); // Integração que faremos
+const whatsapp = require('./whatsapp-api');
+
+exports.handler = async (event) => {
+    // 1. O robô pesquisa o histórico do cliente
+    // 2. O Gemini define a melhor abordagem de venda
+    const proposta = "Olá! Notei que você buscou o produto X. Temos uma condição de PIX Parcelado em 4x hoje. Quer o link?";
+    
+    // 3. Prospecção Ativa
+    await whatsapp.enviarMensagem("5561983446343", proposta);
+    
+    return { statusCode: 200, body: "Prospecção realizada com sucesso" };
+};
+
+
+</script>
+
+
+</section>
+    </main>
+</body>
+</html>
