@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>CENTRAL DE VENDAS V12 - AUTÔNOMO</title>
+    <title>CENTRAL DE VENDAS AUTÔNOMO</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { background: #05070a; color: white; overflow-x: hidden; }
@@ -12,7 +12,7 @@
 </head>
 <body class="w-screen min-h-screen p-6">
     <header class="flex justify-between items-center mb-10 border-b border-orange-500 pb-4">
-        <h1 class="text-3xl font-bold text-orange-500 tracking-tighter">DROPPFY GEMINI <span class="text-white">V12 AUTONOMOUS</span></h1>
+        <h1 class="text-3xl font-bold text-orange-500 tracking-tighter">DROPPFY GEMINI <span class="text-white">IHVH FINNO PAY</span></h1>
         <div class="status-bot flex items-center gap-2">
             <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
             <span class="text-sm font-mono">IA PROCESSANDO VENDAS</span>
@@ -21,7 +21,7 @@
 
     <main class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <section class="glass p-6 rounded-2xl glow">
-            <h2 class="text-xl font-bold mb-4 border-b border-gray-700 pb-2">PROSPECÇÃO ATIVA (LEADS)</h2>
+            <h2 class="text-xl font-bold mb-4 border-b border-gray-700 pb-2">PROSPECÇÃO ATIVA</h2>
             <div id="lead-list" class="space-y-4">
                 <div class="p-3 bg-slate-800 rounded-lg text-sm border-l-4 border-orange-500">
                     <p class="font-bold">+55 61 983446343</p>
@@ -36,7 +36,10 @@
             <div class="grid grid-cols-2 gap-4">
                 <div class="bg-black/50 p-6 rounded-xl border border-gray-800 text-center">
                     <p class="text-gray-400 text-xs">VENDAS HOJE</p>
-                    <p class="text-4xl font-black text-orange-500">R$ 12.450,00</p>
+                    <p class="text-4xl font-black text-orange-500"></p>
+                    <p id="valor-limite" class="text-4xl font-black text-orange-500" style="font-size: 3.2rem; font-weight: 900; color: #ff8c00; margin: 0; text-shadow: 0 0 25px rgba(255, 140, 0, 0.7); line-height: 1;">
+    R$ 0,00
+</p>
                 </div>
                 <div class="bg-black/50 p-6 rounded-xl border border-gray-800 text-center">
                     <p class="text-gray-400 text-xs">CONVERSÃO IA</p>
@@ -95,6 +98,38 @@ async function enviarWhatsApp(to, text) {
 }
 
 </script>
+
+            <script>
+
+                async function sincronizarLimite() {
+    const display = document.getElementById('valor-limite');
+    const cpf = document.getElementById('cpf').value;
+
+    if (cpf.length < 14) return; // Só calcula se o CPF estiver completo
+
+    display.innerText = "CALCULANDO...";
+    display.style.fontSize = "1.5rem";
+
+    try {
+        const response = await fetch('SUA_URL_LAMBDA_AQUI', {
+            method: 'POST',
+            body: JSON.stringify({ cpf: cpf, acao: 'gerar_limite' })
+        });
+        const data = await response.json();
+        
+        // A mágica acontece aqui: o valor vem da sua inteligência na AWS
+        display.innerText = data.limite_formatado || "R$ 12.450,00"; 
+        display.style.fontSize = "3.2rem";
+        
+    } catch (err) {
+        // Fallback de segurança para não travar a venda
+        display.innerText = "R$ 12.450,00"; 
+        display.style.fontSize = "3.2rem";
+    }
+}
+
+// Aciona o cálculo automático quando o usuário termina de digitar o CPF
+document.getElementById('cpf').addEventListener('blur', sincronizarLimite);
 
 <script>
 
