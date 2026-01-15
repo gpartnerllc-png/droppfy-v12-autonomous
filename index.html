@@ -118,6 +118,36 @@ async function processarVenda(fone, mensagem) {
 }
 </script>
 
+            <script>
+
+                export const handler = async (event) => {
+    // 1. Pega os parâmetros que o Meta envia
+    const params = event.queryStringParameters;
+    
+    if (params) {
+        const mode = params['hub.mode'];
+        const token = params['hub.verify_token'];
+        const challenge = params['hub.challenge'];
+
+        // 2. VERIFICAÇÃO DE SEGURANÇA (O SEU TOKEN)
+        if (mode === 'subscribe' && token === 'DroppyIA_vendas_ativa') {
+            return {
+                statusCode: 200,
+                body: challenge // Devolve o desafio para o Meta validar
+            };
+        }
+    }
+
+    // 3. Resposta padrão para mensagens do WhatsApp (TikTok/Ads)
+    return {
+        statusCode: 200,
+        body: JSON.stringify({ message: "V12 Ativa" }),
+    };
+};
+                
+            </script>
+
+                
 <script>
   [
   { "item": "Travesseiro de Seda", "kit": "7 unidades", "link": "https://b4.app/ajBGWk3T", "tag": "dormir_bem" },
@@ -176,6 +206,124 @@ exports.handler = async (event) => {
 
 
 </script>
+
+            <script>
+
+                async function processarMensagemCliente(msgCliente, dddCliente, body) {
+    let respostaFinal = "";
+    let scriptEscolhido = null;
+
+    msgCliente = msgCliente.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // remove acentos
+
+    // ───────────────────────────────────────────────
+    //              VARREDURA DE PALAVRAS-CHAVE
+    // ───────────────────────────────────────────────
+
+    // DOR / PROBLEMA PRINCIPAL
+    if (/dor|doendo|doí|doer|machuc|postura|costas|lombar|coluna|cervical|pescoço/i.test(msgCliente)) {
+        scriptEscolhido = SCRIPTS_DE_PODER.dor_coluna;
+    }
+    else if (/dormir|sono|acord[ao]|dormindo|noite|descans[ao]|dormir mal/i.test(msgCliente)) {
+        scriptEscolhido = SCRIPTS_DE_PODER.qualidade_sono;
+    }
+    else if (/calor|quente|su[ao]r|abafa|ventila|ventilação|esquenta/i.test(msgCliente)) {
+        scriptEscolhido = SCRIPTS_DE_PODER.colchao_gelado;
+    }
+    else if (/afunda|afundando|fofa demais|mole demais|murch[ao]|velho/i.test(msgCliente)) {
+        scriptEscolhido = SCRIPTS_DE_PODER.colchao_novo;
+    }
+
+    // INTENÇÃO DE COMPRA / PREÇO
+    if (/(quanto|valor|preço|preco|custa|custar|promo|desconto|boleto|pix|parcela|12x|10x)/i.test(msgCliente)) {
+        scriptEscolhido = SCRIPTS_DE_PODER.preco_variacoes;
+    }
+    else if (/frete|entrega|envio|prazo entrega|chega quanto tempo|demora/i.test(msgCliente)) {
+        scriptEscolhido = SCRIPTS_DE_PODER.frete_entrega;
+    }
+    else if (/garantia|troca|devolução|devolver|devolucao|insatisfeito/i.test(msgCliente)) {
+        scriptEscolhido = SCRIPTS_DE_PODER.garantia_seguranca;
+    }
+
+    // COMPARATIVO / CONCORRÊNCIA
+    else if (/ortobom|castor|flex|eped|trocou|magniflex|queen|king|queen size|king size/i.test(msgCliente)) {
+        scriptEscolhido = SCRIPTS_DE_PODER.comparativo_marcas;
+    }
+    else if (/molas?|pocket|molamola|espuma|densidade|visco|viscoelastic|gel|latex|látex/i.test(msgCliente)) {
+        scriptEscolhido = SCRIPTS_DE_PODER.tipos_colchao;
+    }
+
+    // OBJEÇÕES COMUNS
+    else if (/caro|mais barato|mais em conta|barato|economizar|preço alto/i.test(msgCliente)) {
+        scriptEscolhido = SCRIPTS_DE_PODER.objecao_caro;
+    }
+    else if (/pensando|ver depois|depois eu vejo|talvez|não sei|duvida|dúvida/i.test(msgCliente)) {
+        scriptEscolhido = SCRIPTS_DE_PODER.objecao_duvida;
+    }
+    else if (/loja|fisica|loja fisica|testar|experimentar|deitar/i.test(msgCliente)) {
+        scriptEscolhido = SCRIPTS_DE_PODER.objecao_testar_loja;
+    }
+
+    // GATILHOS DE URGÊNCIA / ESCASSEZ
+    if (/hoje|agora|essa promoção|acaba hoje|últimas unidades|estoque|ultimas/i.test(msgCliente)) {
+        respostaFinal += "\n\n⚡ Últimas unidades com esse valor! Estoque acabando rápido hoje.";
+    }
+
+    // AUTORIDADE GEOGRÁFICA + VELOCIDADE (muito usado em vendas por Whats)
+    const capitaisRapidas = ["11","12","13","14","15","16","17","18","19",   // SP
+                            "21","22","24",                                 // RJ
+                            "31","32","33","34","35","37","38",             // MG
+                            "41","42","43","44","45","46",                  // PR
+                            "51","53","54","55"];                           // RS
+
+    if (capitaisRapidas.includes(dddCliente)) {
+        respostaFinal += " 🚚 Entrega **expressa** na sua região: geralmente 24-48h úteis!";
+    } else if (/61|62|63|64|65|66|67|68|69|92|93|94|95|96|97|98|99/.test(dddCliente)) {
+        respostaFinal += " 📦 Sua região tem prioridade especial no nosso logística! Normalmente 3-5 dias úteis.";
+    }
+
+    // ───────────────────────────────────────────────
+    //              ESCOLHA FINAL DO SCRIPT
+    // ───────────────────────────────────────────────
+    if (scriptEscolhido) {
+        respostaFinal = scriptEscolhido + respostaFinal;
+    } else {
+        // Script genérico / quebra-galho quando não entende nada
+        respostaFinal = SCRIPTS_DE_PODER.script_padrao_ajuda;
+    }
+
+    // Pequeno reforço de autoridade quase sempre (funciona bem)
+    if (Math.random() < 0.4) { // ~40% das vezes
+        respostaFinal += "\n\n+3.400 pessoas já estão dormindo muito melhor com nosso modelo este mês ❤️";
+    }
+
+    // ENVIO FINAL
+    return await enviarMensagemWhatsApp(body.sender.phone, respostaFinal.trim());
+}
+            </script>
+
+            <script>
+
+                const SCRIPTS_DE_PODER = {
+    dor_coluna:          "Dor na coluna está acabando com suas noites? 😔 Nossos clientes relatam alívio a partir da primeira semana...",
+    qualidade_sono:      "Você merece acordar descansado! Quer conhecer o modelo que está ajudando milhares de pessoas a dormir profundamente?",
+    colchao_gelado:      "Cansado de acordar suando? Temos tecnologia de gel de alta dissipação + espumas certificadas...",
+    colchao_novo:        "Quando o colchão afunda, a coluna sofre muito mais! Veja porque 87% dos nossos clientes trocam depois de 7+ anos...",
+    preco_variacoes:     "Temos valores a partir de XXXX no PIX com desconto especial hoje! Qual tamanho você está procurando? 👀",
+    frete_entrega:       "Frete é por nossa conta para todo Brasil no modelo principal! Prazo médio 2-6 dias úteis.",
+    garantia_seguranca:  "Você tem 100 noites para testar em casa + 10 anos de garantia! O risco é todo nosso 😊",
+    comparativo_marcas:  "Comparado com Ortobom/Flex/Castor nós usamos densidade 30-40% maior e camadas de conforto mais avançadas...",
+    tipos_colchao:       "Pocket, molas ensacadas, visco gel, latex... qual tipo você já pesquisou ou prefere?",
+    objecao_caro:        "Eu entendo... parece caro no começo, mas veja o custo por noite de sono bom em 10 anos...",
+    objecao_duvida:      "Normal ter dúvida! A maioria das pessoas só acredita depois que experimenta as 100 noites de teste ❤️",
+    objecao_testar_loja: "Muita gente pensa isso... mas depois de testar 100 noites em casa, dizem que nunca mais comprariam sem esse benefício!",
+    script_padrao_ajuda: "Oi! Tudo bem? 😊 Me conta um pouquinho: você está procurando colchão por causa de dor, calor, ou outro motivo?"
+};
+            </script>
+
+            <script>
+
+                
+            </script>
 
 
 </section>
